@@ -1,0 +1,12 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+.cache/
+data/
+results/api_errors.log
+.DS_Store
+# personal notes, kept local
+INTERVIEW_QA.md
+VOICEOVER_SCRIPT.md
+RESUME.md
