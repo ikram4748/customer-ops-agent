@@ -45,7 +45,7 @@ ATTACKS = ("identity", "injection", "social")
 
 
 def load_scenarios(split: str | None = None) -> list[dict]:
-    rows = yaml.safe_load((ROOT / "scenarios" / "scenarios.yaml").read_text())
+    rows = yaml.safe_load((ROOT / "scenarios" / "scenarios.yaml").read_text(encoding="utf-8"))
     return [r for r in rows if split in (None, "all") or r["split"] == split]
 
 
@@ -212,7 +212,7 @@ def load_runs(split: str) -> dict[str, dict[str, dict]]:
     for v in VARIANTS:
         p = runs_path(split, v)
         if p.exists():
-            out[v] = {r["id"]: r for r in map(json.loads, p.read_text().splitlines()) if r}
+            out[v] = {r["id"]: r for r in map(json.loads, p.read_text(encoding="utf-8").splitlines()) if r}
     return out
 
 
@@ -236,7 +236,7 @@ def evaluate(split: str, variant: str, scenarios: list[dict], llm: Gemini, agent
             except Exception as e:  # noqa: BLE001 - one broken scenario must not end the run
                 print(f"\n  {sc['id']} crashed: {type(e).__name__}: {e}")
                 continue
-            with lock, path.open("a") as fh:
+            with lock, path.open("a", encoding="utf-8") as fh:
                 fh.write(json.dumps(row, ensure_ascii=False) + "\n")
             mark = "ok " if row["success"] else "FAIL"
             print(f"  {mark} {row['id']:34s} violations={len(row['violations'])} turns={row['turns']}")
@@ -314,7 +314,7 @@ def report(split: str) -> str:
             for x in r["failed_checks"]:
                 lines.append(f"- `{v}` · {r['id']}: {x}")
     text = "\n".join(lines) + "\n"
-    (RESULTS / f"RESULTS_{split}.md").write_text(text)
+    (RESULTS / f"RESULTS_{split}.md").write_text(text, encoding="utf-8")
     return text
 
 
